@@ -32,7 +32,7 @@ def processar_documento():
     Use o conteúdo abaixo para responder à pergunta de forma clara e em português.
     
     CONTEÚDO:
-    {conteudo[:3000]}  # Limita para não travar a memória
+    {conteudo[15000:35000]}  # Limita para não travar a memória
     
     PERGUNTA:
     {pergunta}
