@@ -1,46 +1,39 @@
-from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_ollama import OllamaLLM
 import os
 
-# Configura o modelo Llama 3.2 que você já tem no PC
 llm = OllamaLLM(model="llama3.2")
 
 def processar_documento():
-    print("\n=== ANALISTA DE DOCUMENTOS PRIVADO ===")
-    nome_arquivo = input("Digite o nome do arquivo com extensão (ex: teste.txt ou aula.pdf): ")
-    
+    print("\n=== ANALISTA DE DOCUMENTOS PROFISSIONAL ===")
+    nome_arquivo = input("Digite o nome do arquivo (ex: documento.pdf): ")
+
     if not os.path.exists(nome_arquivo):
-        print("Erro: Arquivo não encontrado nesta pasta!")
+        print("Erro: Arquivo não encontrado!")
         return
 
-    print(f"Lendo {nome_arquivo}...")
+    loader = PyPDFLoader(nome_arquivo)
+    paginas = loader.load()
     
-    # Escolhe o leitor certo conforme a extensão
-    if nome_arquivo.endswith(".pdf"):
-        loader = PyPDFLoader(nome_arquivo)
-    else:
-        loader = TextLoader(nome_arquivo, encoding="utf-8")
+    # Vamos pegar as páginas 10 a 30, onde as leis costumam começar nesse PDF
+    conteudo_focado = "\n".join([p.page_content for p in paginas[10:30]])
 
-    docs = loader.load()
-    conteudo = "\n".join([d.page_content for d in docs])
+    pergunta = input("\nO que você deseja saber? ")
 
-    pergunta = input("\nO que você deseja saber sobre este documento? ")
-
-    # Monta a instrução para a IA
     prompt = f"""
-    Você é um assistente de IA especializado em análise de documentos.
-    Use o conteúdo abaixo para responder à pergunta de forma clara e em português.
-    
-    CONTEÚDO:
-    {conteudo[:100000]}  # Limita para não travar a memória
-    
+    Você é um assistente que analisa o livro 'As 48 Leis do Poder'.
+    Baseado APENAS no texto abaixo, responda de forma direta.
+    Se não encontrar a resposta exata, diga que não encontrou.
+
+    TEXTO:
+    {conteudo_focado}
+
     PERGUNTA:
     {pergunta}
     """
 
-    print("\nIA Analisando...")
+    print("\nAnalisando...")
     resposta = llm.invoke(prompt)
     print(f"\nRESPOSTA DA IA:\n{resposta}")
 
-if __name__ == "__main__":
-    processar_documento()
+processar_documento()
